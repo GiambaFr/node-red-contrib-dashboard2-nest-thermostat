@@ -17,7 +17,7 @@
   ],
   "node-red": {
     "nodes": {
-      "thermostat-dial": "thermostat-dial.js"
+      "nest-thermostat": "nest-thermostat.js"
     }
   },
   "author": "Votre Nom",
