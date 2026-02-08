@@ -1,6 +1,6 @@
 <script type="text/javascript">
-    RED.nodes.registerType('thermostat-dial', {
-        category: 'dashboard',
+    RED.nodes.registerType('nest-thermostat', {
+        category: 'dashboard2',
         color: '#E36304',
         defaults: {
             name: {value: ""},
@@ -18,9 +18,9 @@
         outputs: 1,
         icon: "font-awesome/fa-thermometer-half",
         label: function() {
-            return this.name || "Thermostat Dial";
+            return this.name || "Nest - Thermostat";
         },
-        paletteLabel: "thermostat dial"
+        paletteLabel: "node-red-contrib-dashboard2-nest-thermostat"
     });
 </script>
 
