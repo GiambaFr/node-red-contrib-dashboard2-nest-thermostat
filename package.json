@@ -1,5 +1,5 @@
 {
-  "name": "node-red-contrib-thermostat-dial",
+  "name": "node-red-contrib-dashboard2-nest-thermostat",
   "version": "1.0.0",
   "description": "Un thermostat circulaire interactif de style Nest avec hystérésis et mode Away",
   "main": "thermostat-dial.js",
