@@ -1,0 +1,229 @@
+[
+    {
+        "id": "thermostat_example_flow",
+        "type": "tab",
+        "label": "Exemple Thermostat",
+        "disabled": false,
+        "info": "Flow d'exemple pour le thermostat circulaire"
+    },
+    {
+        "id": "ui_group_thermostat",
+        "type": "ui_group",
+        "name": "Thermostat Salon",
+        "tab": "ui_tab_home",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "ui_tab_home",
+        "type": "ui_tab",
+        "name": "Accueil",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "thermostat_dial_1",
+        "type": "thermostat-dial",
+        "z": "thermostat_example_flow",
+        "name": "Thermostat Salon",
+        "group": "ui_group_thermostat",
+        "order": 1,
+        "width": 6,
+        "height": 6,
+        "minTemp": 15,
+        "maxTemp": 28,
+        "hysteresis": 0.5,
+        "mode": "heat",
+        "awayOffset": -3,
+        "x": 490,
+        "y": 200,
+        "wires": [
+            ["debug_output", "control_hvac"]
+        ]
+    },
+    {
+        "id": "inject_temp_sensor",
+        "type": "inject",
+        "z": "thermostat_example_flow",
+        "name": "Simuler température",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 140,
+        "wires": [
+            ["random_temp"]
+        ]
+    },
+    {
+        "id": "random_temp",
+        "type": "function",
+        "z": "thermostat_example_flow",
+        "name": "Température aléatoire",
+        "func": "// Simuler une température ambiante qui varie\nconst currentTemp = flow.get('ambient_temp') || 20;\nconst variation = (Math.random() - 0.5) * 0.3;\nconst newTemp = Math.round((currentTemp + variation) * 10) / 10;\n\nflow.set('ambient_temp', newTemp);\n\nmsg.payload = {\n    ambient_temperature: newTemp,\n    target_temperature: flow.get('target_temp') || 21\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 140,
+        "wires": [
+            ["thermostat_dial_1"]
+        ]
+    },
+    {
+        "id": "debug_output",
+        "type": "debug",
+        "z": "thermostat_example_flow",
+        "name": "Sortie thermostat",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 710,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "control_hvac",
+        "type": "function",
+        "z": "thermostat_example_flow",
+        "name": "Contrôler chauffage",
+        "func": "// Stocker la température cible pour la simulation\nflow.set('target_temp', msg.payload.target_temperature);\n\n// Contrôler le chauffage selon hvac_state\nconst hvacState = msg.payload.hvac_state;\nconst mode = msg.payload.mode;\nconst away = msg.payload.away;\n\nlet status = {\n    fill: hvacState ? \"green\" : \"grey\",\n    shape: \"dot\",\n    text: \"\"\n};\n\nif (away) {\n    status.text = `Away - `;\n}\n\nif (hvacState) {\n    if (mode === \"heat\") {\n        status.text += `Chauffage ON - ${msg.payload.target_temperature}°C`;\n        status.fill = \"red\";\n    } else {\n        status.text += `Climatisation ON - ${msg.payload.target_temperature}°C`;\n        status.fill = \"blue\";\n    }\n} else {\n    status.text += `Arrêté - ${msg.payload.ambient_temperature}°C`;\n}\n\nnode.status(status);\n\n// Ici vous pourriez envoyer une commande à votre système HVAC réel\n// Par exemple via MQTT, HTTP, ou Home Assistant\nmsg.topic = \"hvac/command\";\nmsg.payload = {\n    state: hvacState ? \"on\" : \"off\",\n    mode: mode,\n    temperature: msg.payload.target_temperature\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 240,
+        "wires": [
+            ["mqtt_publish"]
+        ]
+    },
+    {
+        "id": "mqtt_publish",
+        "type": "mqtt out",
+        "z": "thermostat_example_flow",
+        "name": "Publier commande HVAC",
+        "topic": "home/hvac/salon",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "",
+        "x": 930,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "inject_away_on",
+        "type": "inject",
+        "z": "thermostat_example_flow",
+        "name": "Activer Away",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"away\":true}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 260,
+        "wires": [
+            ["thermostat_dial_1"]
+        ]
+    },
+    {
+        "id": "inject_away_off",
+        "type": "inject",
+        "z": "thermostat_example_flow",
+        "name": "Désactiver Away",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"away\":false}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 300,
+        "wires": [
+            ["thermostat_dial_1"]
+        ]
+    },
+    {
+        "id": "inject_leaf_on",
+        "type": "inject",
+        "z": "thermostat_example_flow",
+        "name": "Activer feuille",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"has_leaf\":true}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 340,
+        "wires": [
+            ["thermostat_dial_1"]
+        ]
+    },
+    {
+        "id": "comment_1",
+        "type": "comment",
+        "z": "thermostat_example_flow",
+        "name": "📝 Instructions",
+        "info": "Ce flow démontre l'utilisation du thermostat circulaire.\n\n**Simulation automatique** :\n- La température ambiante varie automatiquement toutes les 5 secondes\n- Le thermostat calcule automatiquement l'état HVAC selon l'hystérésis\n\n**Contrôles manuels** :\n- Cliquer sur \"Activer Away\" pour activer le mode absence\n- Cliquer sur \"Activer feuille\" pour afficher l'indicateur d'économie\n- Modifier la température directement sur le thermostat dans le dashboard\n\n**Sortie** :\n- Les commandes HVAC sont publiées via MQTT (configurer le broker)\n- Les changements sont affichés dans le debug\n\n**Personnalisation** :\n- Double-cliquer sur le thermostat pour modifier les paramètres\n- Ajuster l'hystérésis, les températures min/max, le mode, etc.",
+        "x": 150,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "comment_2",
+        "type": "comment",
+        "z": "thermostat_example_flow",
+        "name": "🎛️ Contrôles",
+        "info": "",
+        "x": 140,
+        "y": 220,
+        "wires": []
+    }
+]

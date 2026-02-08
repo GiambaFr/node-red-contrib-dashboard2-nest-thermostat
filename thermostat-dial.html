@@ -1,0 +1,104 @@
+<script type="text/javascript">
+    RED.nodes.registerType('thermostat-dial', {
+        category: 'dashboard',
+        color: '#E36304',
+        defaults: {
+            name: {value: ""},
+            group: {type: "ui_group", required: true},
+            order: {value: 0},
+            width: {value: 6},
+            height: {value: 6},
+            minTemp: {value: 10, validate: RED.validators.number()},
+            maxTemp: {value: 30, validate: RED.validators.number()},
+            hysteresis: {value: 0.1, validate: RED.validators.number()},
+            mode: {value: "heat"},
+            awayOffset: {value: -3, validate: RED.validators.number()}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-thermometer-half",
+        label: function() {
+            return this.name || "Thermostat Dial";
+        },
+        paletteLabel: "thermostat dial"
+    });
+</script>
+
+<script type="text/html" data-template-name="thermostat-dial">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-group"><i class="fa fa-table"></i> Group</label>
+        <input type="text" id="node-input-group">
+    </div>
+    <div class="form-row">
+        <label for="node-input-width"><i class="fa fa-arrows-h"></i> Width</label>
+        <input type="number" id="node-input-width" placeholder="6" style="width: 100px">
+    </div>
+    <div class="form-row">
+        <label for="node-input-height"><i class="fa fa-arrows-v"></i> Height</label>
+        <input type="number" id="node-input-height" placeholder="6" style="width: 100px">
+    </div>
+    <div class="form-row">
+        <label for="node-input-minTemp"><i class="fa fa-thermometer-empty"></i> Min Temp</label>
+        <input type="number" id="node-input-minTemp" placeholder="10" style="width: 100px"> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-maxTemp"><i class="fa fa-thermometer-full"></i> Max Temp</label>
+        <input type="number" id="node-input-maxTemp" placeholder="30" style="width: 100px"> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-cog"></i> Mode</label>
+        <select id="node-input-mode" style="width: 200px">
+            <option value="heat">🔥 Chauffage</option>
+            <option value="cool">❄️ Refroidissement</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-hysteresis"><i class="fa fa-sliders"></i> Hystérésis</label>
+        <input type="number" id="node-input-hysteresis" placeholder="0.1" step="0.1" style="width: 100px"> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-awayOffset"><i class="fa fa-suitcase"></i> Away Offset</label>
+        <input type="number" id="node-input-awayOffset" placeholder="-3" step="0.5" style="width: 100px"> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-order"><i class="fa fa-sort-numeric-asc"></i> Order</label>
+        <input type="number" id="node-input-order" placeholder="0" style="width: 100px">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="thermostat-dial">
+    <p>Un thermostat circulaire interactif de style Nest avec hystérésis et mode Away.</p>
+    
+    <h3>Entrée</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>
+            <ul>
+                <li><code>ambient_temperature</code> - Température ambiante actuelle</li>
+                <li><code>target_temperature</code> - Température cible</li>
+                <li><code>mode</code> - Mode (heat/cool) - optionnel</li>
+                <li><code>hysteresis</code> - Hystérésis - optionnel</li>
+                <li><code>awayOffset</code> - Offset en mode Away - optionnel</li>
+                <li><code>has_leaf</code> - Afficher l'icône feuille - optionnel</li>
+                <li><code>away</code> - Mode Away actif - optionnel</li>
+            </ul>
+        </dd>
+    </dl>
+
+    <h3>Sortie</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>
+            Objet contenant tous les paramètres incluant target_temperature modifié et hvac_state calculé
+        </dd>
+    </dl>
+
+    <h3>Détails</h3>
+    <p>Le thermostat affiche la température cible au centre et la température ambiante sur le cadran.</p>
+    <p>Cliquez sur l'icône valise en bas pour activer/désactiver le mode Away.</p>
+    <p>Glissez sur le thermostat pour ajuster la température cible.</p>
+</script>
