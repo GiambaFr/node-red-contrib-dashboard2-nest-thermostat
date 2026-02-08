@@ -1,30 +1,41 @@
 {
-  "name": "node-red-contrib-dashboard2-nest-thermostat",
+  "name": "@giambafr/node-red-contrib-dashboard2-nest-thermostat",
   "version": "1.0.0",
-  "description": "Un thermostat circulaire interactif de style Nest avec hystérésis et mode Away",
-  "main": "nest-thermostat.js",
+  "description": "A circular Nest-style thermostat widget for Node-RED Dashboard 2.0 with hysteresis and Away mode",
+  "main": "ui-nest-thermostat.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "node-red",
+    "node-red-dashboard-2",
     "thermostat",
     "nest",
     "hvac",
     "temperature",
     "dashboard",
-    "ui"
+    "dashboard2",
+    "ui",
+    "widget"
   ],
   "node-red": {
+    "version": ">=3.0.0",
     "nodes": {
-      "nest-thermostat": "nest-thermostat.js"
+      "ui-nest-thermostat": "ui-nest-thermostat.js"
     }
   },
-  "author": "Votre Nom",
+  "author": "JB ELEC <contact@jbelec.pro>",
   "license": "MIT",
-  "dependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/GiambaFr/node-red-contrib-dashboard2-nest-thermostat"
+    "url": "https://github.com/GiambaFr/node-red-contrib-dashboard2-nest-thermostat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GiambaFr/node-red-contrib-dashboard2-nest-thermostat/issues"
+  },
+  "homepage": "https://github.com/GiambaFr/node-red-contrib-dashboard2-nest-thermostat#readme",
+  "dependencies": {},
+  "peerDependencies": {
+    "@flowfuse/node-red-dashboard": ">=1.0.0"
   }
 }

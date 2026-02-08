@@ -1,0 +1,190 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ui-nest-thermostat', {
+        category: 'dashboard 2.0',
+        color: '#E36304',
+        defaults: {
+            group: { type: 'ui-group', required: true },
+            name: { value: '' },
+            order: { value: 0 },
+            width: { value: 6 },
+            height: { value: 6 },
+            className: { value: '' },
+            minTemp: { value: 10, validate: RED.validators.number(), required: true },
+            maxTemp: { value: 30, validate: RED.validators.number(), required: true },
+            ambientTemp: { value: 20, validate: RED.validators.number() },
+            targetTemp: { value: 21, validate: RED.validators.number() },
+            mode: { value: 'heat' },
+            hysteresis: { value: 0.5, validate: RED.validators.number(), required: true },
+            awayOffset: { value: -3, validate: RED.validators.number(), required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'font-awesome/fa-thermometer-half',
+        paletteLabel: 'nest thermostat',
+        label: function () {
+            return this.name || 'Nest Thermostat'
+        },
+        oneditprepare: function () {
+            // Initialiser les champs si nécessaire
+            $('#node-input-width').typedInput({
+                type: 'num',
+                types: ['num']
+            })
+            $('#node-input-height').typedInput({
+                type: 'num',
+                types: ['num']
+            })
+        }
+    })
+</script>
+
+<script type="text/html" data-template-name="ui-nest-thermostat">
+    <div class="form-row">
+        <label for="node-input-group"><i class="fa fa-table"></i> Group</label>
+        <input type="text" id="node-input-group" placeholder="Group">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-className"><i class="fa fa-code"></i> Class</label>
+        <input type="text" id="node-input-className" placeholder="Optional CSS class name(s)">
+    </div>
+    
+    <div class="form-row">
+        <label style="width: 100%; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+            <i class="fa fa-cog"></i> <strong>Size</strong>
+        </label>
+    </div>
+    <div class="form-row">
+        <label for="node-input-width" style="width: 120px;"><i class="fa fa-arrows-h"></i> Width</label>
+        <input type="text" id="node-input-width" placeholder="6" style="width: 70px;">
+        <label for="node-input-height" style="width: 80px; margin-left: 20px;"><i class="fa fa-arrows-v"></i> Height</label>
+        <input type="text" id="node-input-height" placeholder="6" style="width: 70px;">
+    </div>
+    
+    <div class="form-row">
+        <label style="width: 100%; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 10px;">
+            <i class="fa fa-thermometer-half"></i> <strong>Temperature Range</strong>
+        </label>
+    </div>
+    <div class="form-row">
+        <label for="node-input-minTemp" style="width: 120px;"><i class="fa fa-thermometer-empty"></i> Min Temp</label>
+        <input type="number" id="node-input-minTemp" placeholder="10" style="width: 70px;"> °C
+        <label for="node-input-maxTemp" style="width: 80px; margin-left: 10px;"><i class="fa fa-thermometer-full"></i> Max Temp</label>
+        <input type="number" id="node-input-maxTemp" placeholder="30" style="width: 70px;"> °C
+    </div>
+    
+    <div class="form-row">
+        <label style="width: 100%; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 10px;">
+            <i class="fa fa-tachometer"></i> <strong>Initial Values</strong>
+        </label>
+    </div>
+    <div class="form-row">
+        <label for="node-input-ambientTemp"><i class="fa fa-home"></i> Ambient</label>
+        <input type="number" id="node-input-ambientTemp" placeholder="20" step="0.5" style="width: 70px;"> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-targetTemp"><i class="fa fa-bullseye"></i> Target</label>
+        <input type="number" id="node-input-targetTemp" placeholder="21" step="0.5" style="width: 70px;"> °C
+    </div>
+    
+    <div class="form-row">
+        <label style="width: 100%; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 10px;">
+            <i class="fa fa-sliders"></i> <strong>Behavior</strong>
+        </label>
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-fire"></i> Mode</label>
+        <select id="node-input-mode" style="width: 200px;">
+            <option value="heat">🔥 Heating (Chauffage)</option>
+            <option value="cool">❄️ Cooling (Climatisation)</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-hysteresis"><i class="fa fa-sliders"></i> Hysteresis</label>
+        <input type="number" id="node-input-hysteresis" placeholder="0.5" step="0.1" min="0.1" max="5" style="width: 70px;"> °C
+        <span class="form-tips" style="margin-left: 10px;">Prevents rapid on/off cycling</span>
+    </div>
+    <div class="form-row">
+        <label for="node-input-awayOffset"><i class="fa fa-suitcase"></i> Away Offset</label>
+        <input type="number" id="node-input-awayOffset" placeholder="-3" step="0.5" min="-10" max="10" style="width: 70px;"> °C
+        <span class="form-tips" style="margin-left: 10px;">Temperature adjustment when away</span>
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-order"><i class="fa fa-sort-numeric-asc"></i> Order</label>
+        <input type="number" id="node-input-order" placeholder="0" style="width: 70px;">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ui-nest-thermostat">
+    <p>A circular Nest-style thermostat widget for Node-RED Dashboard 2.0 with hysteresis and Away mode.</p>
+    
+    <h3>Configuration</h3>
+    <dl class="message-properties">
+        <dt>Group <span class="property-type">ui-group</span></dt>
+        <dd>The Dashboard 2.0 group to display this widget in.</dd>
+        
+        <dt>Temperature Range <span class="property-type">number</span></dt>
+        <dd>Minimum and maximum temperature values (°C) for the thermostat range.</dd>
+        
+        <dt>Mode <span class="property-type">string</span></dt>
+        <dd>Heating or Cooling mode. Determines HVAC behavior.</dd>
+        
+        <dt>Hysteresis <span class="property-type">number</span></dt>
+        <dd>Temperature differential (°C) to prevent rapid on/off cycling. Recommended: 0.5-1.0°C</dd>
+        
+        <dt>Away Offset <span class="property-type">number</span></dt>
+        <dd>Temperature adjustment (°C) when Away mode is active. Negative for energy saving in heating mode.</dd>
+    </dl>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>Object containing thermostat state:
+            <ul>
+                <li><code>ambient_temperature</code> - Current ambient temperature (°C)</li>
+                <li><code>target_temperature</code> - Target temperature setpoint (°C)</li>
+                <li><code>mode</code> - "heat" or "cool"</li>
+                <li><code>hysteresis</code> - Hysteresis value (°C)</li>
+                <li><code>awayOffset</code> - Away mode offset (°C)</li>
+                <li><code>has_leaf</code> - Show energy-saving leaf icon (boolean)</li>
+                <li><code>away</code> - Enable Away mode (boolean)</li>
+            </ul>
+        </dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>Complete thermostat state including:
+            <ul>
+                <li><code>ambient_temperature</code> - Current temperature</li>
+                <li><code>target_temperature</code> - User-adjusted setpoint</li>
+                <li><code>hvac_state</code> - HVAC active state (boolean)</li>
+                <li><code>mode</code> - Current mode</li>
+                <li><code>hysteresis</code> - Current hysteresis</li>
+                <li><code>awayOffset</code> - Current away offset</li>
+                <li><code>has_leaf</code> - Leaf icon state</li>
+                <li><code>away</code> - Away mode state</li>
+            </ul>
+        </dd>
+    </dl>
+
+    <h3>Details</h3>
+    <p>The thermostat calculates HVAC state based on:</p>
+    <ul>
+        <li><strong>Heating mode:</strong> Activates when target > ambient + hysteresis</li>
+        <li><strong>Cooling mode:</strong> Activates when target < ambient - hysteresis</li>
+        <li><strong>Away mode:</strong> Applies offset to target temperature</li>
+    </ul>
+
+    <h3>User Interaction</h3>
+    <ul>
+        <li>Drag vertically/horizontally to adjust target temperature</li>
+        <li>Click suitcase icon to toggle Away mode</li>
+        <li>Visual indicators show HVAC state (heating/cooling/off)</li>
+    </ul>
+</script>
